@@ -67,17 +67,20 @@ class TasksViewController: UITableViewController {
             }
             isDone(true)
         }
-
-        let doneAction = UIContextualAction(style: .normal, title: "Done") { _, _, isDone in
-            StorageManager.shared.doneTask(tasks[indexPath.row])
-            tableView.reloadData()
-            isDone(true)
-        }
-
         editAction.backgroundColor = .orange
-        doneAction.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
-
-        return UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
+        
+        if tasks == currentTasks {
+            let doneAction = UIContextualAction(style: .normal, title: "Done") { _, _, isDone in
+                StorageManager.shared.doneTask(tasks[indexPath.row])
+                tableView.reloadData()
+                isDone(true)
+            }
+            doneAction.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
+            
+            return UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
+        }
+        
+        return UISwipeActionsConfiguration(actions: [editAction, deleteAction])
     }
 
     @objc private func addButtonPressed() {
