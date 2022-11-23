@@ -53,6 +53,33 @@ class TasksViewController: UITableViewController {
         return cell
     }
     
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let tasks = indexPath.section == 0 ? currentTasks : completedTasks else { return nil }
+
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _, _, _ in
+            StorageManager.shared.deleteTask(tasks[indexPath.row])
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+
+        let editAction = UIContextualAction(style: .normal, title: "Edit") { [weak self] _, _, isDone in
+            self?.showAlert(with: tasks[indexPath.row]) {
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
+            isDone(true)
+        }
+
+        let doneAction = UIContextualAction(style: .normal, title: "Done") { _, _, isDone in
+            StorageManager.shared.doneTask(tasks[indexPath.row])
+            tableView.reloadData()
+            isDone(true)
+        }
+
+        editAction.backgroundColor = .orange
+        doneAction.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
+
+        return UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
+    }
+
     @objc private func addButtonPressed() {
         showAlert()
     }
@@ -66,13 +93,13 @@ extension TasksViewController {
         let alert = UIAlertController.createAlert(withTitle: title, andMessage: "What do you want to do?")
         
         alert.action(with: task) { [weak self] taskTitle, note in
-            if let _ = task, let _ = completion {
-                // TODO - edit task
-            } else {
+            if let task = task, let completion = completion {
+                StorageManager.shared.editTask(task, newName: taskTitle, newNote: note)
+                completion()
+            }else {
                 self?.save(task: taskTitle, withNote: note)
             }
         }
-        
         present(alert, animated: true)
     }
     
