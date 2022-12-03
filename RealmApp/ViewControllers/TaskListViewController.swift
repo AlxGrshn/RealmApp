@@ -86,11 +86,10 @@ class TaskListViewController: UITableViewController {
     @IBAction func sortingList(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
             taskLists = taskLists.sorted(byKeyPath: "date")
-            tableView.reloadData()
         } else {
             taskLists = taskLists.sorted(byKeyPath: "name")
-            tableView.reloadData()
         }
+        tableView.reloadData()
     }
     
     @objc private func addButtonPressed() {
@@ -106,7 +105,7 @@ class TaskListViewController: UITableViewController {
         }
     }
     
-    func tasksCount(_ indexPath: IndexPath) -> String {
+   private func tasksCount(_ indexPath: IndexPath) -> String {
         let taskList = taskLists[indexPath.row]
         let taskListCount = taskList.tasks.filter("isComplete = false").count
         return taskListCount == 0 ? "✔️" : "\(taskListCount)"
